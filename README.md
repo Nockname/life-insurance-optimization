@@ -1,5 +1,5 @@
 # Life Insurance Optimization
-Using Gradient Descent to Optimize Premiums Schedule for Universal Life Insurance Policy
+Using gradient descent to optimize premiums schedules for universal life insurance policies.
 
 
 ## The Problem
