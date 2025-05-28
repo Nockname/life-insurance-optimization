@@ -7,6 +7,7 @@ def train(premiums_input = torch.rand((20,)) * 50000.0, n_iters=500000, lr=2, we
     premiums_input.requires_grad_()
     optimizer = torch.optim.Adam([premiums_input], lr=lr)
     losses = []
+    best = (torch.empty((20,)), float('inf'))
     
     for i in range(n_iters):
         
@@ -16,6 +17,9 @@ def train(premiums_input = torch.rand((20,)) * 50000.0, n_iters=500000, lr=2, we
         loss_value = model.smooth_loss(premiums_input, weight, balance_activation_function=balance_activation_function, premiums_modification_function=premiums_modification_function)
 
         losses.append((loss_value.item(), model.positive_balance_years(premiums_input, premiums_modification_function=premiums_modification_function)))
+
+        if loss_value < best[1]:
+            best = (premiums_input.clone().detach(), loss_value)
 
         loss_value.backward()
         optimizer.step()
@@ -35,7 +39,12 @@ def train(premiums_input = torch.rand((20,)) * 50000.0, n_iters=500000, lr=2, we
             premiums_str = "[" + ", ".join(f"{p:10.2f}" for p in rounded_premiums) + "]"
             print(f"\rIteration {i:6d}: Loss = {rounded_loss:12.4f}, Positive Balance Years = {pos_years:3d}, Premiums = {premiums_str}")
 
-    return losses
+    return losses, best
+
+def print_results(losses, best, premiums_modification_function):
+    print("\n\nTraining complete.")
+    print(f"Best Loss: {best[1]:.4f}, with Positive Balance Years: {model.positive_balance_years(best[0], premiums_modification_function=premiums_modification_function)}")
+    print("Best Premiums:", [round(float(premiums_modification_function(p).item()), 2) for p in best[0]])
 
 def plot_losses(losses):
     plt.plot([x[0] for x in losses])
@@ -55,8 +64,9 @@ if __name__ == "__main__":
 
     # Set the random seed for reproducibility
     torch.manual_seed(0)
+    preprocessing = torch.exp
 
-    losses = train(premiums_input= torch.rand((20,)) * 7 + 7, n_iters=1000000, lr=0.001, weight = 0.5, premiums_modification_function=torch.exp)
-    print("\nTraining complete.")
-    print(f"Best Loss: {min(losses, key=lambda x: x[0])[0]:.4f}, with Positive Balance Years: {min(losses, key=lambda x: x[0])[1]}")
+    losses, best = train(premiums_input= torch.rand((20,)) * 7 + 7, n_iters=1000000, lr=0.001, weight = 0.5, premiums_modification_function=preprocessing)
+    
+    print_results(losses, best, premiums_modification_function=preprocessing)
     plot_losses(losses[1250:])
