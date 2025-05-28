@@ -1,4 +1,4 @@
-import core_function
+import model
 import torch
 import matplotlib.pyplot as plt
 
@@ -40,7 +40,7 @@ premiums_best_from_exp = torch.tensor([ 206919.20,     203.61,       0.00,      
 203866.31
 
 # print(core_function.calculate_expected_present_value(premiums_bad, use_excel_rounding=False, change_death_benefit=True, print_output=True).item())
-print("Best (using linear approach):", core_function.calculate_expected_present_value(premiums_best_from_exp, use_excel_rounding=True, change_death_benefit=True).item())
-print(core_function.smooth_loss(premiums_best_from_exp, weight=0.5))
-print(core_function.calculate_balance(premiums_best_from_exp))
+print("Best (using linear approach):", model.calculate_expected_present_value(premiums_best_from_exp, use_excel_rounding=True, change_death_benefit=True).item())
+print(model.smooth_loss(premiums_best_from_exp, weight=0.5))
+print(model.calculate_balance(premiums_best_from_exp))
 

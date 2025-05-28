@@ -1,6 +1,6 @@
-import torch
-
 # ---- Constants for Insurance Plan, Mortality Statistics, and Inflation Rate / Discount Rate ----
+
+import torch
 
 YEARS = 20
 

@@ -1,6 +1,6 @@
 import torch
 import matplotlib.pyplot as plt
-import core_function
+import model
 
 def train(premiums_input = torch.rand((20,)) * 50000.0, n_iters=500000, lr=2, weight = 1.0, balance_activation_function=torch.nn.ELU(5.0), premiums_modification_function = torch.nn.ReLU()):
 
@@ -13,9 +13,9 @@ def train(premiums_input = torch.rand((20,)) * 50000.0, n_iters=500000, lr=2, we
         # gradient descent step
         optimizer.zero_grad()
 
-        loss_value = core_function.smooth_loss(premiums_input, weight, balance_activation_function=balance_activation_function, premiums_modification_function=premiums_modification_function)
+        loss_value = model.smooth_loss(premiums_input, weight, balance_activation_function=balance_activation_function, premiums_modification_function=premiums_modification_function)
 
-        losses.append((loss_value.item(), core_function.positive_balance_years(premiums_input, premiums_modification_function=premiums_modification_function)))
+        losses.append((loss_value.item(), model.positive_balance_years(premiums_input, premiums_modification_function=premiums_modification_function)))
 
         loss_value.backward()
         optimizer.step()
