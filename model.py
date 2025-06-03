@@ -1,15 +1,14 @@
-# %% [markdown]
-# ## Gradient Descent for Life Insurance Premiums
+# Gradient Descent for Life Insurance Premiums
 
-# %%
 import numpy as np
+import constants
 import torch
 import matplotlib.pyplot as plt
 from constants import *
 
 
 # ---- Input ----
-premiums = torch.full((20,), 20000.0)
+premiums = torch.full((YEARS,), 20000.0)
 premiums.requires_grad_()
 
 

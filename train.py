@@ -1,11 +1,32 @@
+# ---- Train Model ----
+
 import torch
 import matplotlib.pyplot as plt
 import model
+
+def print_partial_results(losses, premiums_input, n_iters, i, premiums_modification_function):
+
+    # print progress bar
+    progress = int(50 * (i + 1) / n_iters)
+    bar = '[' + '#' * progress + '-' * (50 - progress) + ']'
+    print(f"\rProgress: {bar} {100 * (i + 1) / n_iters:.2f}%", end='', flush=True)
+    
+    # print results every 1% of iterations
+    if i % (n_iters / 100) == 0:
+        rounded_loss = round(losses[-1][0], 4)
+        pos_years = losses[-1][1]
+        rounded_premiums = [round(float(premiums_modification_function(p).item()), 2) for p in premiums_input]
+        
+        # Format: Loss (12 chars, right), Years (3 chars, right), Premiums (each 10 chars, right)
+        premiums_str = "[" + ", ".join(f"{p:10.2f}" for p in rounded_premiums) + "]"
+        print(f"\rIteration {i:6d}: Loss = {rounded_loss:12.4f}, Positive Balance Years = {pos_years:3d}, Premiums = {premiums_str}")
+    
 
 def train(premiums_input = torch.rand((20,)) * 50000.0, n_iters=500000, lr=2, weight = 1.0, balance_activation_function=torch.nn.ELU(5.0), premiums_modification_function = torch.nn.ReLU()):
 
     premiums_input.requires_grad_()
     optimizer = torch.optim.Adam([premiums_input], lr=lr)
+        
     losses = []
     best = (torch.empty((20,)), float('inf'))
     
@@ -23,21 +44,8 @@ def train(premiums_input = torch.rand((20,)) * 50000.0, n_iters=500000, lr=2, we
 
         loss_value.backward()
         optimizer.step()
-    
-        # print progress bar
-        progress = int(50 * (i + 1) / n_iters)
-        bar = '[' + '#' * progress + '-' * (50 - progress) + ']'
-        print(f"\rProgress: {bar} {100 * (i + 1) / n_iters:.2f}%", end='', flush=True)
         
-        # print results every 1% of iterations
-        if i % (n_iters / 100) == 0:
-            rounded_loss = round(losses[-1][0], 4)
-            pos_years = losses[-1][1]
-            rounded_premiums = [round(float(premiums_modification_function(p).item()), 2) for p in premiums_input]
-            
-            # Format: Loss (12 chars, right), Years (3 chars, right), Premiums (each 10 chars, right)
-            premiums_str = "[" + ", ".join(f"{p:10.2f}" for p in rounded_premiums) + "]"
-            print(f"\rIteration {i:6d}: Loss = {rounded_loss:12.4f}, Positive Balance Years = {pos_years:3d}, Premiums = {premiums_str}")
+        print_partial_results(losses, premiums_input, n_iters, i, premiums_modification_function)
 
     return losses, best
 
