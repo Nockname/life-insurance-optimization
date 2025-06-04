@@ -43,6 +43,14 @@ epvs = [
     model.calculate_expected_present_value(premiums_exponential_preprocessing, change_death_benefit=True).item()
 ]
 
+print("\n" + "-" * 50)
+print("Premium Schedules:")
+print(f"Previous Best Constant Strategy: {[round(x, 2) for x in previous_best.best_const_premiums.tolist()]}")
+print(f"Previous Best Early Strategy: {[round(x, 2) for x in previous_best.best_early_premiums.tolist()]}")
+print(f"Our Model, with Linear Preprocessing: {[round(x, 2) for x in premiums_linear_preprocessing.tolist()]}")
+print(f"Our Model, with Exponential Preprocessing: {[round(x, 2) for x in premiums_exponential_preprocessing.tolist()]}")
+
+print("\n" + "-" * 50)
 print("Expected Present Values:")
 print(f"Previous Best Constant Strategy: {epvs[0]:.2f}")
 print(f"Previous Best Early Strategy: {epvs[1]:.2f}")
